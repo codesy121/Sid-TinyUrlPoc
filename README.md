@@ -1,75 +1,49 @@
-# TinyURL-style POC (C# .NET 6 + React/TypeScript)
+# TinyURL POC — Quick Start
 
-A minimal, runnable proof-of-concept for a TinyURL-like service:
-- Create/delete short URLs for long URLs
-- Resolve short code -> long URL (increments click count)
-- Stats for clicks
-- Optional custom short code, otherwise random unique code
-- In-memory store (NO EF, SQLite, Redis, etc.)
-- **Cache behavior**: same anonymous user + same long URL -> same short code
+A small proof-of-concept TinyURL service (backend: .NET 6, frontend: React + Vite).
 
-> **Anonymous user identity**
->
-> The backend requires an `X-Client-Id` header (string up to 64 chars).
-> The React UI generates a UUID once (stored in `localStorage`) and sends it on every request.
->
-> This is how we implement “same URL submitted by same user gets same tinyURL” without accounts.
+## Backend — what it does (5 steps)
+1. Accepts long URLs and returns a short code (POST /api/urls).
+2. Supports optional custom short codes and enforces uniqueness.
+3. Stores mappings in-memory and returns the caller's list of URLs (GET /api/urls).
+4. Redirects short codes to long URLs (GET /r/{code}) and tracks clicks (GET /api/urls/{code}/stats).
+5. Identifies callers via `X-Client-Id` (no accounts); same client + same long URL → same short code.
 
----
+### API summary
+- POST /api/urls — body: { longUrl, customShortCode? } → create
+- DELETE /api/urls/{code} — remove mapping
+- GET /api/urls/{code} — get mapping (increments clicks)
+- GET /api/urls/{code}/stats — click stats
+- GET /api/urls — list mappings for caller (`X-Client-Id`)
+- GET /r/{code} — 302 redirect to long URL
 
-## Backend (.NET 6)
+### Run backend locally
+1. Open a terminal
+2. cd backend
+3. dotnet restore
+4. dotnet run --project TinyUrl.Api
 
-Folder: `backend/`
-
-### Structure (as requested)
-- `Models/`
-- `Domain/` (interfaces)
-- `Infrastructure/` (implementations: repositories + services)
-- `Controllers/`
-- `TinyUrl.Tests/` (unit tests using Moq, testing services only)
-
-### Endpoints
-- `POST /api/urls` body: `{ longUrl, customShortCode? }`
-- `DELETE /api/urls/{code}`
-- `GET /api/urls/{code}` → `{ shortCode, longUrl }` and increments clicks
-- `GET /api/urls/{code}/stats`
-- `GET /api/urls` → list for the caller (same `X-Client-Id`)
-- `GET /r/{code}` → 302 redirect to the long URL (also increments clicks)
-
-### Run
-```bash
-cd backend
-dotnet restore
-dotnet run --project TinyUrl.Api
-```
-
-Default URLs depend on your environment; typically:
-- `http://localhost:5000` (HTTP)
-- `https://localhost:5001` (HTTPS)
+Default API URLs: http://localhost:5000 and https://localhost:5001
 
 ---
 
-## Frontend (React + TypeScript + Vite)
+## Frontend — what it does and how to use it
+- Small React UI that creates short URLs, lists your URLs, shows stats, and follows redirects.
+- It generates/stores a UUID in `localStorage` and sends it as `X-Client-Id` on each request.
 
-Folder: `frontend/`
+### Run frontend locally
+1. Open a terminal
+2. cd frontend
+3. npm install
+4. npm run dev
 
-### Run
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The UI expects the API at `http://localhost:5000` by default.
-To override:
-```bash
-VITE_API_BASE=http://localhost:5000 npm run dev
-```
+By default the UI calls the API at `http://localhost:5000`. To change: `VITE_API_BASE=http://localhost:5000 npm run dev`
 
 ---
 
-## Notes on concurrency
+## Notes for developers
+- Persistence is in-memory (for simplicity); restarting the backend clears data.
+- Concurrency handled via `ConcurrentDictionary` and `Interlocked.Increment` for counters.
+- There are unit tests in `backend/TinyUrl.Tests` for service logic.
 
-- Storage uses `ConcurrentDictionary` for safe concurrent access.
-- Clicks are incremented with `Interlocked.Increment`.
-- Short-code uniqueness is enforced at creation time (custom + random).
+If you want a deeper README (deploy, design decisions, tests), open an issue or drop a note in the repo.
