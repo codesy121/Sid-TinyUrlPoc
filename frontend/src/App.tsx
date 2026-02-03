@@ -140,10 +140,7 @@ export default function App() {
           </label>
 
           <div className="row">
-            <button type="submit">Get long URL</button>
-            <a className="secondary buttonlike" href={resolveCode.trim() ? redirectUrl(resolveCode.trim()) : '#'} target="_blank" rel="noreferrer">
-              Open redirect
-            </a>
+            <button type="submit">Get long URL</button>           
           </div>
 
           {resolvedLong && (
