@@ -2,7 +2,7 @@
 
 A small proof-of-concept TinyURL service (backend: .NET 6, frontend: React + Vite).
 
-## Backend — what it does (5 steps)
+## Backend — what it does 
 1. Accepts long URLs and returns a short code (POST /api/urls).
 2. Supports optional custom short codes and enforces uniqueness.
 3. Stores mappings in-memory and returns the caller's list of URLs (GET /api/urls).
