@@ -2,7 +2,7 @@
 
 A small proof-of-concept TinyURL service (backend: .NET 6, frontend: React + Vite).
 
-## Backend — what it does 
+## Backend (.Net 6, C#)
 1. Accepts long URLs and returns a short code (POST /api/urls).
 2. Supports optional custom short codes and enforces uniqueness.
 3. Stores mappings in-memory and returns the caller's list of URLs (GET /api/urls).
@@ -27,7 +27,7 @@ Default API URLs: http://localhost:5000 and https://localhost:5001
 
 ---
 
-## Frontend - what it does and how to use it
+## Frontend (React)
 - Small React UI that creates short URLs, lists your URLs, shows stats, and follows redirects.
 - It generates/stores a UUID in `localStorage` and sends it as `X-Client-Id` on each request.
 
